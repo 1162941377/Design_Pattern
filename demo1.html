@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设计模式 - 单例模式 && 代理模式 - 虚拟代理、保护代理</title>
+</head>
+
+<body>
+  <ul class="container"></ul>
+  <button class="btn">click</button>
+  <script>
+    /*
+     * 需求：页面中有一个ul容器，当点击button按钮时，从服务器端获取数据，然后进行缓存，当刷新页面的时候，直接从缓存中获取，如果是离线的状态，那么直接从缓存中获取，点击button按钮时也不进行获取新的数据
+     */
+
+    /* function Test(name) {
+      if (typeof Test.instance === 'object') {
+        return Test.instance;
+      }
+      // console.log(Test.instance)
+      this.name = name;
+      Test.instance = this;
+    };
+    
+    const a = new Test('zou');
+
+    Test.instance = {};
+    const b = new Test();
+    console.log(a === b); */
+
+    // 不符合开闭原则
+
+    /* function Test(name) {
+      const self = this;
+      Test = function () {
+        return self;
+      };
+      this.name = name;
+    };
+
+    const a = new Test('name');
+    Test.instance = {};
+    Test.prototype.test = function() {
+      console.log(1);
+    };
+    const b = new Test();
+    console.log(a === b);
+    console.log(a.test); */
+
+    // 虽然通过闭包，看似是实现了外部访问不到内部的变量，但是改变了prototype原型指向
+
+    /*  const Test = (function () {
+       let instance;
+       return function (name) {
+         if (typeof instance === 'object') {
+           return instance;
+         }
+         instance = this;
+         this.name = name;
+       };
+     })();
+
+     const a = new Test('zou');
+     Test.instance = {};
+     Test.prototype.alert = function () {
+       console.log(1);
+     };
+     const b = new Test();
+     console.log(a === b);
+     console.log(a.alert); */
+
+    // 通过立即执行函数，配合闭包的实现，完美的单例模式
+
+    /* const createDiv = function (text) {
+      const oDiv = document.createElement('div');
+      oDiv.innerText = text;
+      oDiv.style.display = 'none';
+      document.body.appendChild(oDiv);
+      return oDiv;
+    }; */
+
+    /* const createDiv = (function () {
+      let oDiv = null;
+      return function (text) {
+        if (oDiv) {
+          return oDiv;
+        }
+        oDiv = document.createElement('div');
+        oDiv.innerText = text;
+        oDiv.style.display = 'none';
+        document.body.appendChild(oDiv);
+        return oDiv;
+      };
+    })(); */
+
+    /* const createDiv = function (text) {
+      const oDiv = document.createElement('div');
+      oDiv.innerText = text;
+      oDiv.style.display = 'none';
+      document.body.appendChild(oDiv);
+      return oDiv;
+    };
+
+    function getSingleFunc(func) {
+      let result = null;
+      return function () {
+        if (!result) {
+          result =  func.apply(this, arguments);
+        }
+        return result;
+      };
+    };
+
+    const singleAlert = getSingleFunc(createDiv);
+
+    const oBtn = document.getElementsByClassName('btn')[0];
+    oBtn.onclick = function () {
+      const thisDiv = singleAlert('Hello World');
+      thisDiv.style.display = 'block';
+    }; */
+
+
+    /* const oBtn = document.getElementsByClassName('btn')[0];
+    // console.log(oBtn);
+
+    oBtn.onclick = function () {
+      // console.log(this);
+      // console.log(oLi);
+      const oLi = document.createElement('li');
+      oLi.innerText = 'Hello World';
+      document.body.appendChild(oLi);
+    }; */
+
+    /* const mrDeng = {
+      sendFlowers: function (target) {
+        const flower = 'sunFlower';
+        target.receiverFlower(flower);
+      },
+    };
+
+    const goddness = {
+      receiverFlower: function (flower) {
+        console.log(this.mood ? 'ok' : 'get out');
+      },
+      changeMood: function () {
+        this.mood = Math.random() > 0.5 ? true : false;
+      },
+      createMood: function () {
+        this.changeMood();
+        const self = this;
+        setInterval(function () {
+          self.changeMood();
+        }, 300);
+      },
+    };
+
+    // 用到了虚拟、保护、智能代理
+    const mrCheng = {
+      proxyFlower: function (target) {
+        this.listenMood(target, function () {
+          mrDeng.sendFlowers(target);
+        });
+      },
+      listenMood: function (target, func) {
+        let timer = setInterval(function () {
+          if (target.mood) {
+            func();
+            clearInterval(timer);
+          }
+        }, 300);
+      },
+    };
+
+    // 不能确保每次都成功，需要个第三方，也就是代理
+
+    goddness.createMood();
+
+    // mrDeng.sendFlowers(goddness);
+
+    mrCheng.proxyFlower(goddness); */
+  </script>
+</body>
+
+</html>

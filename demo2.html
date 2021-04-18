@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设计模式 - 代理模式</title>
+</head>
+
+<body>
+  <div class="container"></div>
+  <button id="btn">click</button>
+
+  <script>
+    const oDiv = document.getElementsByClassName('container')[0];
+    const oBtn = document.getElementById('btn');
+
+    /* const addImg = (function () {
+      let instance;
+      return function (dom) {
+        if (typeof instance === 'object') {
+          return instance;
+        }
+        const oImg = new Image();
+        this.setsrc = function (src) {
+          oImg.src = src;
+        };
+        instance = this;
+        dom.appendChild(oImg);
+      };
+    })(); */
+
+    /* const addImg = function () {
+      const oImg = new Image();
+      this.setsrc = function (dom, src) {
+        oImg.src = src;
+        dom.appendChild(oImg);
+      };
+    };
+
+    const getSingle = (function () {
+      let result = null;
+      return function (func) {
+        if (!result) {
+          result = func.apply(this, arguments);
+        }
+        return result;
+      };
+    })();
+
+    // const realImg = new getSingle(addImg);
+    const myImg = new getSingle(addImg);
+
+    oBtn.onclick = function () {
+      // const myImg = realImg;
+      myImg.setsrc(
+        document.body,
+        // oDiv,
+        'https://th.bing.com/th/id/Raed9f304afe4245ca8742d97e2249171?rik=ClNbVIiL5H1oAw&riu=http%3a%2f%2fimg.xspic.com%2fimg8%2f95%2f82%2f2445919_5.jpg&ehk=VN02InwL2G%2fsn2UKQ3vhdrcyp1huGvBRt2eNWhqs3nI%3d&risl=&pid=ImgRaw'
+      );
+    }; */
+
+    // 代理模式 - 虚拟代理 - 图片加载和文件上传
+    const addImg = function () {
+      const oImg = new Image();
+      this.setsrc = function (dom, src) {
+        oImg.src = src;
+        dom.appendChild(oImg);
+      };
+    };
+
+    // 结合使用预加载和懒加载，优化页面访问效率
+    const proxyImage = function () {
+      const oImg = new addImg();
+      const myImg = new Image();
+      return function (src) {
+        myImg.onload = function () {
+          setTimeout(function () {
+            oImg.setsrc(document.body, myImg.src);
+          }, 1000);
+        }
+        oImg.setsrc(
+          document.body,
+          'https://th.bing.com/th/id/Raed9f304afe4245ca8742d97e2249171?rik=ClNbVIiL5H1oAw&riu=http%3a%2f%2fimg.xspic.com%2fimg8%2f95%2f82%2f2445919_5.jpg&ehk=VN02InwL2G%2fsn2UKQ3vhdrcyp1huGvBRt2eNWhqs3nI%3d&risl=&pid=ImgRaw'
+        );
+        myImg.src = src;
+      };
+    };
+
+    oBtn.onclick = function () {
+      const realImg = proxyImage();
+      realImg(
+        'https://th.bing.com/th/id/R1e91b26290428e7aabee7a177ad9229c?rik=AXRaW5ytIkALaQ&riu=http%3a%2f%2fpic208.nipic.com%2ffile%2f20190307%2f27148587_101842749951_2.jpg&ehk=tXP4nP2mv4xWQ%2fnNUuoryh%2fHhS3RQePbXQKnsS9sIIg%3d&risl=&pid=ImgRaw'
+      );
+    };
+  </script>
+</body>
+
+</html>

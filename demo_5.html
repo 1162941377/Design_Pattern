@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设计模式 - 工厂模式 && 工厂方法模式</title>
+</head>
+
+<body>
+  <!-- <script>
+    function SmallPlane () {
+      this.width = 100;
+      this.height = 100;
+      this.blood = 100;
+      this.touch = function () {
+        this.blood -= 50;
+        this.die();
+      };
+      this.die = function () {
+        if (this.blood <= 0) {
+          console.log('die');
+        }
+      };
+    };
+
+    function BigPlane () {
+      this.width = 200;
+      this.height = 200;
+      this.blood = 200;
+      this.touch = function () {
+        this.blood -= 50;
+        this.die();
+      };
+      this.die = function () {
+        if (this.blood <= 0) {
+          console.log('die');
+        }
+      };
+    };
+
+    function AttackPlane () {
+      this.width = 125;
+      this.height = 125;
+      this.blood = 125;
+      this.touch = function () {
+        this.blood -= 50;
+        this.die();
+      };
+      this.die = function () {
+        if (this.blood <= 0) {
+          console.log('die');
+        }
+      };
+    };
+
+    const smallPlane = new SmallPlane();
+    const bigPlane = new BigPlane();
+    const attackPlane = new AttackPlane();
+    // 上面代码，有大量的冗余度，也不利于扩展和维护
+  </script> -->
+
+  <!-- <script>
+    function SmallPlane() {
+      this.width = 100;
+      this.height = 100;
+      this.blood = 100;
+    };
+
+    function BigPlane() {
+      this.width = 200;
+      this.height = 200;
+      this.blood = 200;
+    };
+
+    function AttackPlane() {
+      this.width = 125;
+      this.height = 125;
+      this.blood = 125;
+    };
+
+    function FactoryPlane(type) {
+      let plane = null;
+      switch (type) {
+        case 'smallPlane':
+          plane = new SmallPlane;
+          break;
+        case 'bigPlane':
+          plane = new BigPlane;
+          break;
+        case 'attackPlane':
+          plane = new AttackPlane;
+          break;
+      };
+      return plane;
+    };
+
+    const smallPlane = new FactoryPlane('smallPlane');
+    const bigPlane = new FactoryPlane('bigPlane');
+    const attackPlane = new FactoryPlane('attackPlane');
+    // 上面是工厂模式，虽然更利于管理，但是违反了开闭原则
+  </script> -->
+
+  <script>
+    function FactoryPlane() {
+      this.decorate_list = [];
+    };
+
+    FactoryPlane.prototype.SmallPlane = function (x, y) {
+      this.x = x;
+      this.y = y;
+      this.width = 100;
+      this.height = 100;
+      this.blood = 100;
+    };
+
+    FactoryPlane.prototype.BigPlane = function (x, y) {
+      this.x = x;
+      this.y = y;
+      this.width = 200;
+      this.height = 200;
+      this.blood = 200;
+    };
+
+    FactoryPlane.prototype.AttackPlane = function (x, y) {
+      this.x = x;
+      this.y = y;
+      this.width = 125;
+      this.height = 125;
+      this.blood = 125;
+      this.attack = function () {
+        console.log('biu~')
+      };
+    };
+
+    FactoryPlane.prototype.touch = function () {
+      this.blood -= 50;
+      this.die();
+    };
+
+    FactoryPlane.prototype.die = function () {
+      if (this.blood <= 0) {
+        console.log('die');
+      }
+    };
+
+    FactoryPlane.prototype.decorate = function (decorators) {
+      this.decorate_list.push(decorators);
+    };
+
+    FactoryPlane.prototype.decorators = {
+      eatOneLife: function (_this) {
+        _this.blood += 50;
+      },
+      eatTwoLife: function (_this) {
+        _this.blood += 100;
+      },
+      eatShrinkLife: function (_this) {
+        _this.blood -= 50;
+      },
+    };
+
+    FactoryPlane.prototype.update = function () {
+      for (let i = 0; i < this.decorate_list.length; i++) {
+        FactoryPlane.prototype.decorators[this.decorate_list[i]] && FactoryPlane.prototype.decorators[this
+          .decorate_list[i]](this);
+      }
+      // 每次update数据后清空缓存并判断是否存活
+      this.decorate_list = [];
+      this.die();
+    };
+
+    FactoryPlane.create = function (type) {
+      if (!FactoryPlane.prototype[type]) {
+        throw new Error('this type of plane is not exist');
+      }
+      if (FactoryPlane.prototype[type].prototype.__proto__ !== FactoryPlane.prototype) {
+        FactoryPlane.prototype[type].prototype = new FactoryPlane();
+      }
+      const args = [].slice.call(arguments).splice(1);
+      return new FactoryPlane.prototype[type](...args);
+    };
+
+    const sOp = FactoryPlane.create('SmallPlane', 10, 20);
+    const bOp = FactoryPlane.create('BigPlane', 30, 40);
+    const aOp = FactoryPlane.create('AttackPlane', 50, 60);
+  </script>
+</body>
+
+</html>

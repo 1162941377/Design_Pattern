@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设计模式 - 代理模式 - 虚拟代理</title>
+  <style>
+    body {
+      margin: 0;
+    }
+
+    span {
+      display: block;
+      margin: 30px;
+    }
+
+    button {
+      margin: 5px 10px;
+      display: block;
+    }
+
+    span {
+      transition: 0.3s all linear;
+    }
+
+    a {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <span id="text">Hello World</span>
+  <button type="color">add color</button>
+  <button type="backgroundColor">add background</button>
+  <button type="border">add border</button>
+  <button type="fontSize">add fontSize</button>
+  <button type="padding">add padding</button>
+  <button type="opacity">add opacity</button>
+  <a href="javascript: void(0);" id="submit">submit</a>
+
+  <script>
+    const btnArray = document.getElementsByTagName('button');
+    const text = document.getElementById('text');
+    const submit = document.getElementById('submit');
+
+    const type = {
+      'color': 'red',
+      'backgroundColor': '#008c8c',
+      'border': '1px solid black',
+      'fontSize': '20px',
+      'padding': '5px',
+      'opacity': '0.5',
+    };
+
+    /* const addStyle = function (dom, target) {
+      let timer = null;
+      let cache = [];
+      for (const prop in type) {
+        // cache.push(prop, type[prop]);
+        if (prop === target) {
+          // console.log(prop);
+          cache.push(prop, type[prop]);
+          console.log(cache);
+          timer = setTimeout(function () {
+            clearTimeout(timer);
+            dom.style[cache[0]] = cache[1];
+            cache = [];
+          }, 1000);
+        }
+      }
+    }; */
+
+    const state = {
+      type: [],
+    };
+
+    const addStyle = function (dom, target) {
+      // console.log(target);
+      for (const prop in type) {
+        target.forEach(function (ele) {
+          if (ele === prop) {
+            // state.cache.push(type[prop]);
+            // console.log(prop);
+            dom.style[prop] = type[prop];
+          }
+        });
+      }
+    };
+
+    submit.onclick = function () {
+      // console.log(state.cache);
+      // console.log(state.type);
+      addStyle(text, state.type);
+      state.type = [];
+    };
+
+    for (let i = 0; i < btnArray.length; i++) {
+      btnArray[i].onclick = function () {
+        // console.log(this);
+        if (this.getAttribute('data-selected')) {
+          return;
+        }
+        state.type.push(this.getAttribute('type'));
+        this.setAttribute('data-selected', 'true');
+        // console.log(state.type);
+      };
+    }
+
+    /* for (let i = 0; i < btnArray.length; i++) {
+      btnArray[i].onclick = function () {
+        // console.log(btnArray[i])
+        const btnType = this.getAttribute('type');
+        addStyle(text, btnType);
+      };
+    } */
+  </script>
+</body>
+
+</html>

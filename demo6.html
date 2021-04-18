@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设计模式 - 观察者模式</title>
+</head>
+
+<body>
+  <script>
+    function Observe() {
+      this.cache = {}; // 用于存储对应的自定义类型和函数
+      // 属性为对应的类型，值为对应的处理函数
+    };
+
+    /*
+     * 用于自定义事件
+     * type：类型
+     * handle：处理函数
+     */
+    Observe.prototype.on = function (type, handle) {
+      // 如果不存在，则直接存储；如果存在，则直接添加
+      if (!this.cache[type]) {
+        this.cache[type] = [handle];
+      } else {
+        this.cache[type].push(handle);
+      }
+    };
+
+    /*
+     * 用于执行自定义事件，考虑到传递的参数可能不一致，所以用arguments较好
+     */
+    Observe.prototype.emit = function () {
+      // console.log(this.cache);
+      const type = arguments[0];
+      const args = [].slice.call(arguments, 1);
+      // console.log(this.cache[type]);
+      if (!this.cache[type].length) {
+        // console.log('no defined function');
+        throw new Error('no defined function');
+      }
+      for (let i = 0; i < this.cache[type].length; i++) {
+        if (this.cache[type].length === 1) {
+          // console.log(this.cache[type][i]);
+          // 这是照常添加的函数
+          this.cache[type][i].apply(this, args);
+        } else {
+          // 这是once定义的函数
+          // console.log(this.cache[type]);
+          // console.log(1);
+          this.cache[type] = this.cache[type].filter(function (ele) {
+            // console.log(ele);
+            return ele !== true;
+          });
+          // console.log(this.cache[type][i]);
+          this.cache[type][i].apply(this, args);
+          // 调用自身的remove方法，移除该函数
+          this.remove(type, this.cache[type][i]);
+          // console.log(this.cache[type]);
+        }
+      }
+    };
+
+    /*
+     * 用于移除某个自定义类型和函数
+     */
+    Observe.prototype.remove = function (type, handle) {
+      this.cache[type] = this.cache[type].filter(function (ele) {
+        return ele !== handle;
+      });
+    };
+
+    /*
+     * 用于清空自定义类型和函数
+     */
+    Observe.prototype.empty = function (type) {
+      this.cache[type] = [];
+    };
+
+    /*
+     * 用于执行一次的类型和函数
+     */
+    Observe.prototype.once = function (type, handle) {
+      // 如果不存在，则直接存储；如果存在，则直接添加
+      if (!this.cache[type]) {
+        // console.log(1);
+        this.cache[type] = [handle, true];
+      } else {
+        // console.log(1);
+        this.cache[type].push(handle, true);
+      }
+    };
+
+    const observe = new Observe();
+
+    function del1(time) {
+      console.log('time1:' + time);
+    };
+
+    observe.on('over1', del1);
+
+    function del2(time) {
+      console.log('time2:' + time);
+    }
+
+    observe.on('over2', del2);
+
+    observe.emit('over1', 'time1');
+    observe.emit('over2', 'time2');
+
+    // observe.remove('over1', del1);
+    observe.emit('over1', 'time1');
+    observe.emit('over2', 'time2');
+
+    function del3(time) {
+      console.log('time3:' + time);
+    };
+
+    observe.once('over3', del3);
+
+    observe.emit('over3', 'time3');
+    observe.emit('over3', 'time3');
+  </script>
+</body>
+
+</html>

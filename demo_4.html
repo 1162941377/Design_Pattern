@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设计模式 - 代理模式 - 保护代理 + 策略模式</title>
+  <style>
+    body {
+      margin: 0px;
+      font-family: '楷体';
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .container {
+      width: 400px;
+      height: 300px;
+      border: 1px solid black;
+      box-sizing: border-box;
+      margin: 20px;
+      box-shadow: inset 3px 2px 30px rgba(12, 12, 2, .8), 5px 10px 30px rgba(12, 12, 2, 0.8);
+      text-align: center;
+      position: relative;
+    }
+
+    button {
+      margin-top: 30px;
+      font-size: 16px;
+      padding: 3px 10px;
+      margin-right: 15px;
+    }
+
+    input {
+      outline: none;
+      padding: 2px 3px;
+      margin: auto;
+      margin-top: 30px;
+    }
+
+    span {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #dc3545;
+    }
+
+    #spanName {
+      top: 55px;
+    }
+
+    #spanPwd {
+      top: 110px;
+    }
+
+    #spanEmail {
+      top: 165px;
+    }
+
+    #spanPhone {
+      top: 220px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="name">
+      <label for="user">姓名：</label>
+      <input type="text" id="user" placeholder="请输入姓名" />
+      <span id="spanName"></span>
+    </div>
+    <div class="pwd">
+      <label for="pwd">密码：</label>
+      <input type="password" id="pwd" placeholder="请输入密码" />
+      <span id="spanPwd"></span>
+    </div>
+    <div class="email">
+      <label for="email">邮箱：</label>
+      <input type="email" id="email" placeholder="请输入邮箱" />
+      <span id="spanEmail"></span>
+    </div>
+    <div class="phone">
+      <label for="phone">号码：</label>
+      <input type="tel" id="phone" placeholder="请输入号码" />
+      <span id="spanPhone"></span>
+    </div>
+    <button type="submit" id="submit">submit</button>
+    <button type="reset" id="reset">reset</button>
+  </div>
+
+  <script src="./validator.js"></script>
+
+  <script>
+    // 前端验证
+    const oDiv = document.getElementsByClassName('containers')[0];
+    const btnSubmit = document.getElementById('submit');
+    const btnReset = document.getElementById('reset');
+
+    // 发送数据
+    function sendData() {
+      console.log('send');
+    };
+
+    const validator = new dataValidator();
+
+    validator.extend({
+      'isEmail': function (value, errorMsg) {
+        if (value !== '' && value.indexOf('@') === -1) {
+          return errorMsg;
+        }
+        return true;
+      },
+      'isPhone': function (value, errorMsg) {
+        if (value !== '' && value.length !== 11) {
+          return errorMsg;
+        }
+        return true;
+      },
+    });
+
+    // console.log(validator.strategies);
+
+    // 按需添加校验规则
+    validator.add(user, spanName, [{
+      strategy: 'isNonEmpty',
+      errorMsg: '姓名不能为空',
+    }, {
+      strategy: 'maxLength: 4',
+      errorMsg: '姓名长度不能超过4位',
+    }]);
+
+    validator.add(pwd, spanPwd, [{
+      strategy: 'isNonEmpty',
+      errorMsg: '密码不能为空',
+    }, {
+      strategy: 'minLength: 4',
+      errorMsg: '密码长度不能小于4位',
+    }]);
+
+    validator.add(email, spanEmail, [{
+      strategy: 'isNonEmpty',
+      errorMsg: '邮箱不能为空',
+    }, {
+      strategy: 'isEmail',
+      errorMsg: '邮箱格式不正确',
+    }]);
+
+    validator.add(phone, spanPhone, [{
+      strategy: 'isNonEmpty',
+      errorMsg: '号码不能为空',
+    }, {
+      strategy: 'isPhone',
+      errorMsg: '号码位数必须是11位',
+    }]);
+
+    btnSubmit.onclick = function () {
+      if (validator.start()) {
+        sendData();
+      }
+    };
+
+    btnReset.onclick = function () {
+      validator.clear();
+    };
+  </script>
+</body>
+
+</html>
